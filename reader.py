@@ -1,5 +1,6 @@
 # reader.py
 import os
+import re
 
 class Reader:
     def __init__(self):
@@ -21,3 +22,24 @@ class Reader:
             exit(1)
 
         print(f"Sucesso: O diretório '{caminho_do_diretorio}' é válido e existe.")
+
+    def get_tex_files(self, caminho_do_diretorio):
+        self.verify_path(caminho_do_diretorio)
+        tex_files = []
+        for file in os.listdir(caminho_do_diretorio):
+            if file.endswith('.tex'):
+                tex_files.append(os.path.join(caminho_do_diretorio, file))
+        if not tex_files:
+            print(f"Erro: Nenhum arquivo .tex encontrado no diretório '{caminho_do_diretorio}'.")
+            exit(1)
+        return tex_files
+
+    def find_equations_in_files(self, tex_files):
+        equations = {}
+        for tex_file in tex_files:
+            with open(tex_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            # Find equations between \begin{equation}...\end{equation}
+            eqs = re.findall(r'\\begin\{equation\}(.*?)\\end\{equation\}', content, re.DOTALL)
+            equations[tex_file] = eqs
+        return equations
