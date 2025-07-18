@@ -35,7 +35,7 @@ Ele busca especificamente o conteúdo dentro dos seguintes ambientes LaTeX, que 
 As equações extraídas são armazenadas em um dicionário, onde a chave é o nome do arquivo .tex (por exemplo, meu_documento.tex) e o valor é uma lista de strings, cada string contendo o LaTeX de uma equação encontrada naquele arquivo.
 
 ## Designer
-Em breve...
+O módulo `Designer` será a interface de interação para a criação de cenários de animação. Sua principal função será permitir que o usuário defina como as equações, uma vez extraídas pelo Reader, devem ser visualizadas e animadas.
 
 ## Animator
-Em breve...
+O módulo `Animator` será o motor de renderização das animações, utilizando diretamente a biblioteca Manim. Ele receberá as equações processadas pelo Reader e os setups de animação definidos pelo Designer, orquestrando a criação final dos vídeos.
