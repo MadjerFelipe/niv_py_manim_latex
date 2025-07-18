@@ -1,5 +1,15 @@
 # niv_py_manin_latex
 
+Este projeto visa simplificar e automatizar a criação de animações de equações matemáticas utilizando a biblioteca Manim. Atualmente, a geração de animações Manim a partir de equações LaTeX pode ser um processo manual e detalhado, exigindo codificação direta para cada elemento animado. Nosso objetivo é eliminar parte dessa complexidade, permitindo que os usuários:
+
+- Extraiam equações diretamente de seus documentos LaTeX (`.tex`) existentes.
+
+- Definam setups de animação de forma mais intuitiva e menos programática.
+
+- Gerem vídeos Manim de suas equações com facilidade, transformando documentos estáticos em apresentações visuais dinâmicas.
+
+A ideia central é criar uma ponte eficiente entre seus arquivos `.tex` e o poder de animação do Manim, tornando o processo acessível e ágil para educadores, estudantes e criadores de conteúdo que desejam visualizar conceitos matemáticos de forma interativa.
+
 ## Reader
 
 O módulo `Reader` é a camada de extração de dados do projeto, responsável por localizar, validar e parsear o conteúdo de projetos LaTeX. Ele garante que as equações matemáticas possam ser identificadas e preparadas para as etapas subsequentes de design e animação. Utilize este módulo para centralizar a lógica de leitura e pré-processamento dos arquivos que serão utilizados nas animações ou demais funcionalidades do projeto. Suas funcionalidades incluem:
