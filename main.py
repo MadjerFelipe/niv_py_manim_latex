@@ -5,7 +5,7 @@ import re
 
 if __name__ == "__main__":
     # Definindo o diretório de teste diretamente
-    path = "C:/Users/Madjer/Documents/Nivelamento/2025/Seringueiros/PC/Apostilas/PC_Álgebra"
+    path = "C:/Users/Madjer/Documents/Nivelamento/2026/manim_py"
 
     print(f"Verificando o diretório: {path}")
     print("-" * 30)
@@ -19,4 +19,5 @@ if __name__ == "__main__":
     print("-" * 30)
     print("Programa principal finalizado (neste ponto).")
 
+    print('Equações encontradas:')
     print(eqs)
