@@ -16,6 +16,7 @@ if __name__ == "__main__":
 
     eqs = leitor.find_equations_in_files(files)
 
-
     print("-" * 30)
     print("Programa principal finalizado (neste ponto).")
+
+    print(eqs)
