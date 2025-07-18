@@ -4,19 +4,23 @@ import re
 
 class Reader:
     def __init__(self):
-        # O construtor pode ser simples por enquanto.
-        # No futuro, talvez você queira inicializar configs aqui.
-        pass
+        pass  # Construtor simples; pode ser expandido futuramente para configurações
 
     def verify_path(self, caminho_do_diretorio):
+
+        caminho_do_diretorio = os.path.normpath(caminho_do_diretorio.replace('\\', '/'))
+        
+        # Verifica se o caminho é uma string
         if not isinstance(caminho_do_diretorio, str):
             print("Erro: O caminho do diretório deve ser uma string.")
             exit(1)
 
+        # Verifica se o caminho existe
         if not os.path.exists(caminho_do_diretorio):
             print(f"Erro: O diretório '{caminho_do_diretorio}' não existe.")
             exit(1)
 
+        # Verifica se o caminho é um diretório
         if not os.path.isdir(caminho_do_diretorio):
             print(f"Erro: '{caminho_do_diretorio}' não é um diretório válido.")
             exit(1)
@@ -37,15 +41,14 @@ class Reader:
     def find_equations_in_files(self, tex_files):
         all_equations = {}
 
-        # Definir os ambientes de equação que queremos buscar
-        # E indicar se eles podem ter múltiplas linhas (usando \\)
+        # Lista de ambientes LaTeX de equações e se suportam múltiplas linhas
         equation_environments = [
-            ("equation", "equation", False),    # Normalmente uma linha
-            ("equation*", "equation*", False),  # Normalmente uma linha
-            ("eqnarray", "eqnarray", True),     # Múltiplas linhas
-            ("eqnarray*", "eqnarray*", True),   # Múltiplas linhas
-            ("align", "align", True),           # Múltiplas linhas
-            ("align*", "align*", True),         # Múltiplas linhas
+            ("equation", "equation", False),
+            ("equation*", "equation*", False),
+            ("eqnarray", "eqnarray", True),
+            ("eqnarray*", "eqnarray*", True),
+            ("align", "align", True),
+            ("align*", "align*", True),
         ]
 
         for tex_file in tex_files:
@@ -59,13 +62,11 @@ class Reader:
 
                     for eq_content_raw in eqs_found_raw:
                         if is_multiline:
-                            # Se for um ambiente de múltiplas linhas, faça o split
-                            # O re.split é mais robusto que .split() para lidar com espaços/quebras de linha
-                            # Ele divide por '\\' e remove strings vazias
+                            # Divide o conteúdo em linhas usando '\\' para ambientes multiline
                             lines = [line.strip() for line in re.split(r'\\\\\s*', eq_content_raw) if line.strip()]
                             file_equations.extend(lines)
                         else:
-                            # Para ambientes de linha única, apenas adicione o conteúdo
+                            # Para ambientes de linha única, adiciona o conteúdo diretamente
                             file_equations.append(eq_content_raw.strip())
 
             except Exception as e:
@@ -78,12 +79,8 @@ class Reader:
         return all_equations
     
     def _find_equations_by_environment(self, content, begin_env, end_env):
-        # Escapando caracteres especiais na string do ambiente para a regex
+        # Monta a expressão regular para capturar o conteúdo entre \begin e \end do ambiente
         escaped_begin = re.escape(f"\\begin{{{begin_env}}}")
         escaped_end = re.escape(f"\\end{{{end_env}}}")
-
-        # Construindo a regex com os ambientes escapados
-        # O padrão (.*?) captura o conteúdo não-guloso entre os delimitadores
-        # re.DOTALL permite que o '.' case com quebras de linha
         pattern = rf'{escaped_begin}(.*?){escaped_end}'
         return re.findall(pattern, content, re.DOTALL)
