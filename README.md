@@ -10,39 +10,30 @@ Este projeto visa simplificar e automatizar a criação de animações de equaç
 
 A ideia central é criar uma ponte eficiente entre seus arquivos `.tex` e o poder de animação do Manim, tornando o processo acessível e ágil para educadores, estudantes e criadores de conteúdo que desejam visualizar conceitos matemáticos de forma interativa.
 
-## Reader
+## Módulo `Reader`
 
-O módulo `Reader` é a camada de extração de dados do projeto, responsável por localizar, validar e parsear o conteúdo de projetos LaTeX. Ele garante que as equações matemáticas possam ser identificadas e preparadas para as etapas subsequentes de design e animação. Utilize este módulo para centralizar a lógica de leitura e pré-processamento dos arquivos que serão utilizados nas animações ou demais funcionalidades do projeto. Suas funcionalidades incluem:
+O módulo `Reader` é a **camada de extração de dados** fundamental do projeto, responsável por localizar, validar e parsear o conteúdo de projetos LaTeX. Ele garante que as equações matemáticas possam ser identificadas e preparadas de forma estruturada para as etapas subsequentes de design e animação.
 
-- Leitura de arquivos de entrada e conversão de conteúdo em estruturas utilizáveis pelo restante do projeto.
-- Manipulação de strings e tratamento de comandos LaTeX, se necessário.
-- Possível suporte a diferentes formatos de entrada, com tratamento de erros e validação de dados.
+### Funcionalidades Implementadas
+
+* **Validação e Normalização de Caminhos:** O `Reader` agora lida de forma robusta com caminhos de diretório, aceitando diferentes formatos de barras (`\` ou `/`) comuns em diversos sistemas operacionais. Ele verifica a existência e a validade do diretório fornecido, normalizando o caminho para garantir compatibilidade e evitar erros.
+* **Identificação de Arquivos LaTeX:** Varrre o diretório especificado para localizar todos os arquivos com a extensão `.tex`, filtrando automaticamente os arquivos relevantes para o processamento.
+* **Extração de Equações por Ambiente:** É capaz de identificar e extrair blocos completos de equações de diversos ambientes matemáticos LaTeX comumente utilizados, incluindo:
+    * `\begin{equation}...\end{equation}`
+    * `\begin{equation*}...\end{equation*}`
+    * `\begin{eqnarray}...\end{eqnarray}`
+    * `\begin{eqnarray*}...\end{eqnarray*}`
+    * `\begin{align}...\end{align}`
+    * `\begin{align*}...\end{align*}`
+* **Granularidade de Saída Otimizada:** As equações são retornadas em um dicionário onde cada chave é um **ID único para o bloco da equação** (por exemplo, `nome_do_arquivo.tex_block_0`). O valor associado a cada ID é uma **lista de strings**, onde cada string representa uma linha daquela equação (mesmo para equações de linha única, que serão uma lista com um único item). Isso oferece a granularidade ideal para o `Designer` e `Animator` manipularem as equações como blocos ou linha por linha, conforme a necessidade de animação.
+* **Tratamento de Erros de Leitura:** Inclui tratamento de exceções para lidar com problemas durante a leitura de arquivos, permitindo que o processo continue para outros arquivos mesmo se um deles estiver inacessível ou corrompido.
 
 ### Métodos Principais
-`Reader.verify_path(caminho_do_diretorio)`
-    Este método é o primeiro ponto de contato com o sistema de arquivos. Ele valida o caminho fornecido, garantindo que ele realmente existe e aponta para um diretório. Se o caminho for inválido ou não for um diretório, o programa é encerrado para evitar erros nas etapas posteriores.
 
-`Reader.get_tex_files(caminho_do_diretorio)`
-    Após a validação do diretório, esta função é responsável por localizar todos os arquivos .tex dentro do caminho especificado. Ela retorna uma lista de caminhos completos para esses arquivos. Caso nenhum arquivo .tex seja encontrado no diretório, o processo é interrompido, pois não haveria equações para processar.
-
-`Reader.find_equations_in_files(tex_files)`
-    Este é o coração da funcionalidade de extração do Reader. Ele recebe a lista de arquivos .tex e, para cada um, lê seu conteúdo para identificar e extrair equações matemáticas.
-
-Ele busca especificamente o conteúdo dentro dos seguintes ambientes LaTeX, que são comumente usados para equações:
-
-- `\begin{equation}...\end{equation}`
-
-- `\begin{equation*}...\end{equation*}`
-
-- `\begin{eqnarray}...\end{eqnarray}`
-
-- `\begin{eqnarray*}...\end{eqnarray*}`
-
-- `\begin{align}...\end{align}`
-
-- `\begin{align*}...\end{align*}`
-
-As equações extraídas são armazenadas em um dicionário, onde a chave é o nome do arquivo .tex (por exemplo, meu_documento.tex) e o valor é uma lista de strings, cada string contendo o LaTeX de uma equação encontrada naquele arquivo.
+* `Reader.verify_path(caminho_do_diretorio)`: Valida o `caminho_do_diretorio` fornecido, garantindo que ele exista e seja um diretório válido. Também normaliza o caminho para ser compatível com o sistema operacional.
+* `Reader.get_tex_files(caminho_do_diretorio)`: Localiza todos os arquivos `.tex` dentro do `caminho_do_diretorio` validado e retorna uma lista de seus caminhos completos.
+* `Reader.find_equations_in_files(tex_files)`: Percorre a lista de `tex_files` e extrai as equações de ambientes matemáticos específicos, retornando um dicionário mapeando IDs de bloco de equação para listas de strings de suas linhas.
+* `Reader._find_equations_by_environment(content, begin_env, end_env)`: (Auxiliar/Interno) Função interna que utiliza expressões regulares para encontrar o conteúdo de equações dentro de um par `\begin{ambiente}...\end{ambiente}` específico em uma dada string de conteúdo.
 
 ## Designer
 O módulo `Designer` será a interface de interação para a criação de cenários de animação. Sua principal função será permitir que o usuário defina como as equações, uma vez extraídas pelo Reader, devem ser visualizadas e animadas.
