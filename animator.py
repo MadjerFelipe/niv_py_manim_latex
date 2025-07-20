@@ -2,10 +2,44 @@ import os
 import subprocess
 import datetime
 import sys
+import json
+import shutil
 
 class Animator:
     def __init__(self):
-        print("Animator inicializado (versão de teste simplificada).")
+        print("Animator inicializado.")
+
+    def _build_temp_manim_scene(self, template_dir="templates", template_name="scene_template.py"):
+        """
+        Cria um arquivo de cena Manim temporário a partir de um template.
+
+        Args:
+            template_dir (str): Diretório do template.
+            template_name (str): Nome do arquivo de template.
+
+        Returns:
+            str: Caminho completo para o arquivo temporário criado, ou None em caso de erro.
+        """
+        template_full_path = os.path.join(template_dir, template_name)
+        temp_dir = "temp"
+        os.makedirs(temp_dir, exist_ok=True)
+        print(f"  Pasta de arquivos temporários '{temp_dir}/' garantida.")
+
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        temp_scene_file_name = f"temp_scene_{timestamp}.py"
+        temp_scene_full_path = os.path.join(temp_dir, temp_scene_file_name)
+
+        try:
+            shutil.copyfile(template_full_path, temp_scene_full_path)
+            print(f"  Template '{template_full_path}' copiado para '{temp_scene_full_path}'.")
+            return temp_scene_full_path
+        except FileNotFoundError:
+            print(f"Erro: Arquivo de template '{template_full_path}' não encontrado.")
+            print("  Certifique-se de que a pasta 'templates' e o arquivo 'scene_template.py' existem.")
+            return None
+        except Exception as e:
+            print(f"Erro ao copiar o arquivo de template: {e}")
+            return None
 
     def test_hello_manim(self, output_dir="test_hello_manim_animations"):
         """
