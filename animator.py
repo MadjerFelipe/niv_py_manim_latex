@@ -1,15 +1,10 @@
-# animator.py
 import os
 import subprocess
-import json
 import datetime
-import sys # Necessário para sys.executable
+import sys
 
 class Animator:
     def __init__(self):
-        """
-        Inicializa o Animator. Não recebe parâmetros no construtor nesta versão simplificada.
-        """
         print("Animator inicializado (versão de teste simplificada).")
 
     def test_hello_manim(self, output_dir="test_hello_manim_animations"):
@@ -25,48 +20,42 @@ class Animator:
         os.makedirs(output_dir, exist_ok=True)
         print(f"Vídeo de saída será salvo em: {output_dir}")
 
-        # Gerar um nome de arquivo de saída único com timestamp
+        # Gera nome de arquivo único com timestamp
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file_name_base = f"hello_manim_{timestamp}"
 
-        # 1. Conteúdo da cena Manim "Hello Manim"
+        # Define o conteúdo da cena Manim
         manim_scene_content = f"""
 from manim import Scene, Text, Write, WHITE
 
 class HelloManimScene(Scene):
     def construct(self):
-        # Cria um objeto de texto "Hello Manim!"
         hello_text = Text("Hello Manim!", color=WHITE).scale(1.5)
-
-        # Anima a escrita do texto na tela
         self.play(Write(hello_text))
-
-        # Espera por um tempo
         self.wait(1.5)
 """
-        
-        # 2. Escrever o conteúdo da cena em um arquivo temporário
+        # Cria arquivo temporário com a cena
         temp_scene_file = "temp_hello_manim_scene.py"
         with open(temp_scene_file, 'w', encoding='utf-8') as f:
             f.write(manim_scene_content)
         print(f"  Cena Manim temporária '{temp_scene_file}' criada.")
 
-        # 3. Preparar o comando Manim para execução via subprocess
+        # Prepara comando para renderizar a cena com Manim
         manim_command = [
             sys.executable, "-m", "manim",
             temp_scene_file,
-            "HelloManimScene",  # Nome da classe da cena dentro do arquivo temporário
-            "--media_dir", os.path.join(os.getcwd(), output_dir), # Diretório raiz para a saída do Manim
-            "-o", output_file_name_base, # Nome do arquivo de saída (sem extensão .mp4)
-            "-ql",               # Qualidade baixa (para renderização rápida)
-            "--disable_caching", # Garante que o Manim renderize a cada execução
-            "--write_all",       # Garante que o método construct seja executado
+            "HelloManimScene",
+            "--media_dir", os.path.join(os.getcwd(), output_dir),
+            "-o", output_file_name_base,
+            "-ql",
+            "--disable_caching",
+            "--write_all",
         ]
 
         print(f"\n  Executando comando Manim: {' '.join(manim_command)}")
 
         try:
-            # Executar o comando Manim
+            # Executa o comando Manim e captura a saída
             result = subprocess.run(manim_command, capture_output=True, text=True, check=True)
 
             print("\n--- Saída do Manim (stdout) ---")
@@ -88,9 +77,83 @@ class HelloManimScene(Scene):
         except Exception as e:
             print(f"\nUm erro inesperado ocorreu: {e}")
         finally:
-            # Limpar o arquivo temporário da cena
+            # Remove o arquivo temporário da cena
             if os.path.exists(temp_scene_file):
                 os.remove(temp_scene_file)
                 print(f"  Arquivo temporário '{temp_scene_file}' removido.")
 
         print("\n--- Teste 'Hello Manim' Concluído ---")
+
+    def render_manim_file(self, manim_file_path, output_dir="rendered_manim_files"):
+            """
+            Renderiza diretamente um arquivo de cena Manim (.py) existente.
+
+            Args:
+                manim_file_path (str): O caminho para o arquivo .py da cena Manim a ser renderizada.
+                output_dir (str): Diretório onde o vídeo de saída será salvo.
+            """
+            print(f"\n--- Iniciando teste: Renderizando arquivo Manim '{manim_file_path}' ---")
+
+            if not os.path.exists(manim_file_path):
+                print(f"Erro: Arquivo Manim '{manim_file_path}' não encontrado.")
+                return
+            if not os.path.isfile(manim_file_path):
+                print(f"Erro: '{manim_file_path}' não é um arquivo válido.")
+                return
+            if not manim_file_path.endswith('.py'):
+                print(f"Erro: '{manim_file_path}' não é um arquivo Python válido (.py).")
+                return
+
+            os.makedirs(output_dir, exist_ok=True)
+            print(f"Vídeo de saída será salvo em: {output_dir}")
+
+            # Extrair o nome da classe da cena do arquivo Manim
+            # Para um teste simples, vamos assumir que a primeira classe Scene encontrada é a que queremos.
+            # Em um cenário real, você teria que saber o nome da classe ou parsear o arquivo.
+            # No seu manim_scene_template.py, a classe é 'HelloManimScene'.
+            scene_class_name = "HelloManimScene" # Hardcoded para o seu manim_scene_template.py de teste
+
+            # Gerar um nome de arquivo de saída único com timestamp
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            # O nome do vídeo será baseado no nome do arquivo Manim original
+            base_file_name = os.path.splitext(os.path.basename(manim_file_path))[0]
+            output_file_name_base = f"{base_file_name}_{timestamp}"
+
+            # Preparar o comando Manim para execução via subprocess
+            manim_command = [
+                sys.executable, "-m", "manim",
+                manim_file_path,        # Passa o caminho direto para o arquivo Manim
+                scene_class_name,       # Nome da classe da cena
+                "--media_dir", os.path.join(os.getcwd(), output_dir),
+                "-o", output_file_name_base,
+                "-ql",
+                "--disable_caching",
+                "--write_all",
+                "--verbosity", "DEBUG", # Mantenha o DEBUG para ver logs detalhados
+            ]
+
+            print(f"\n  Executando comando Manim: {' '.join(manim_command)}")
+
+            try:
+                result = subprocess.run(manim_command, capture_output=True, text=True, check=True)
+
+                print("\n--- Saída do Manim (stdout) ---")
+                print(result.stdout)
+                if result.stderr:
+                    print("\n--- Saída do Manim (stderr) ---")
+                    print(result.stderr)
+
+                print(f"\nComando Manim executado com sucesso! Código de saída: {result.returncode}")
+                print(f"Verifique o vídeo em: {os.path.join(output_dir, 'videos', base_file_name, '480p15', f'{output_file_name_base}.mp4')}")
+                
+            except subprocess.CalledProcessError as e:
+                print(f"\nErro ao renderizar a animação (Manim falhou): {e}")
+                print("  Saída do Manim (stdout):\n", e.stdout)
+                print("  Saída do Manim (stderr):\n", e.stderr)
+            except FileNotFoundError:
+                print("\nErro: O comando 'manim' (ou 'python') não foi encontrado.")
+                print("  Certifique-se de que o Manim CLI e o Python estão acessíveis no PATH do seu ambiente virtual.")
+            except Exception as e:
+                print(f"\nUm erro inesperado ocorreu: {e}")
+
+            print("\n--- Teste de Renderização de Arquivo Manim Concluído ---")

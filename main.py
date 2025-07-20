@@ -58,6 +58,14 @@ if __name__ == "__main__":
             exit(0)
 
         animador = Animator()
-        animador.test_hello_manim(output_dir="minhas_animacoes_de_teste")
+        #animador.test_hello_manim(output_dir="minhas_animacoes_de_teste")
+        # Define o caminho para o seu arquivo de cena Manim de teste (o prefab)
+        manim_file_to_test = "manim_scene_template.py"
+        
+        # Define o diretório onde o vídeo será salvo
+        output_test_dir = "direto_do_manim_template"
+        
+        # Chama a nova função para renderizar o arquivo Manim
+        animador.render_manim_file(manim_file_to_test, output_test_dir)
 
     print("\n--- Processamento concluído ---")
