@@ -1,3 +1,10 @@
+# Ignorar pasta de arquivos temporários
+temp/
+animations/
+test_animations_prefab_output/
+rendered_manim_files/
+direto_do_manim_template/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
